@@ -1,0 +1,55 @@
+﻿@page "/LinkView/{LinkIdentifier}"
+@layout UserLayout;
+@inject Services.Tagservice tagService;
+
+<div class="card">
+
+    <div class="card-body text-center">
+        <p class="AttributeHead">🧑 Vorname</p>
+        <p>@tagModel.FirstName</p>
+        <p class="AttributeHead">🧑 Nachname</p>
+        <p>@tagModel.LastName</p>
+        <p class="AttributeHead">📧 E-Mail</p>
+        <p>
+            <a href="mailto:@tagModel.EMail">@tagModel.EMail</a>
+        </p>
+        <p class="AttributeHead">📱 Telefon</p>
+        <p>
+            <a href="tel:@tagModel.Phone">@tagModel.Phone</a>
+        </p>
+        <p class="AttributeHead">🗺️ Addresse</p>
+        <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=79.84933018684386%2C6.90329331805479%2C79.85746264457703%2C6.908917042549519&marker=6.906105188659279%2C79.85339641571045&layers=ND" />
+  
+        @if(tagModel.IsMissing)
+        {
+            <div class="alert alert-danger" role="alert">
+                @tagModel.MissingNote
+            </div>
+        }
+      
+        <br/>
+    
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string LinkIdentifier { get; set; }
+
+    private Models.TagModel tagModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        tagModel = await tagService.GetTagByLinkIdentifier(LinkIdentifier);
+    }
+
+}
+
+
+<style>
+
+    .AttributeHead {
+        font-weight: bold;
+    }
+   
+</style>

@@ -1,0 +1,16 @@
+﻿@inject Services.Tagservice tagService;
+@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Bisschen Statistiken</h1>
+
+<p>Anzahl der Link: <b>@tags.Count</b></p>
+
+@code{
+    List<Models.TagModel> tags = new();
+    protected override async Task OnInitializedAsync()
+    {
+        tags = await tagService.GetAllTags();
+    }
+}

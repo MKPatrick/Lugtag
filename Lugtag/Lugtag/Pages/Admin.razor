@@ -1,0 +1,50 @@
+﻿@inject Services.Tagservice tagservice;
+@page "/Admin"
+@using System.Text;
+
+<h3>Admin</h3>
+
+<button @onclick="CrateNewTag" type="button" class="btn btn-success">Create NEW</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Edit</th>
+            <th scope="col">View</th>
+            <th scope="col">Name</th>
+            <th scope="col">Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tag in tagModels)
+        {
+            <tr>
+                <th scope="row">@tag.Id</th>
+                <td><a href="/LinkEdit/@tag.LinkIdentifier">@tag.LinkIdentifier</a></td>
+                <td><a href="/LinkView/@tag.LinkIdentifier">@tag.LinkIdentifier</a></td>
+                <td>@tag.FirstName</td>
+                <td>@tag.Phone</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+
+@code {
+    List<Models.TagModel> tagModels = new();
+    protected override async Task OnInitializedAsync()
+    {
+        tagModels = await tagservice.GetAllTags();
+        tagModels.Reverse();
+    }
+
+    async Task CrateNewTag()
+    {
+        var tag = new Models.TagModel() { LinkIdentifier = Convert.ToBase64String(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())) };
+        await tagservice.AddTag(tag);
+        tagModels.Insert(0,tag);
+
+    }
+}

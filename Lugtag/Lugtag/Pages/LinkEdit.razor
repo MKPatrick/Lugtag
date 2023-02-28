@@ -1,0 +1,89 @@
+﻿@page "/LinkEdit/{LinkIdentifier}"
+@layout UserLayout;
+@inject IJSRuntime JsRuntime
+@inject Services.Tagservice tagService;
+<h3 class="text-center">Ändere deinen Inhalt</h3>
+<div>
+    <EditForm Model="tagModel" OnValidSubmit="Submit">
+        <div class="card">
+
+            <div class="card-body text-center">
+                <p class="AttributeHead">🧑 Nachname</p>
+                <input type="text" @bind-value=@tagModel.FirstName class="form-control" placeholder="Vorname" aria-label="Vorname" aria-describedby="basic-addon1">
+                <p class="AttributeHead">🧑 Nachname</p>
+                <input type="text" @bind-value=@tagModel.LastName class="form-control" placeholder="Nachname" aria-label="Nachname" aria-describedby="basic-addon1">
+
+                <p class="AttributeHead">📧 E-Mail</p>
+                <input type="email" @bind-value=@tagModel.EMail class="form-control" placeholder="Nachname" aria-label="Nachname" aria-describedby="basic-addon1">
+
+
+                <p class="AttributeHead">📱 Telefon</p>
+                <input type="tel" @bind-value=@tagModel.Phone class="form-control" placeholder="Nachname" aria-label="Nachname" aria-describedby="basic-addon1">
+
+
+
+
+
+            </div>
+            <button type="submit" class="btn btn-primary text-center">💾 Tag Informationen Updaten</button>
+        <br/>
+            @if (tagModel.IsMissing == false)
+        {
+            <button @onclick="SetMissing" class="btn btn-danger text-center">Als vermisst melden</button>
+        }
+        else
+        {
+            <button @onclick="UnsetMissing" class="btn btn-success text-center">Als gefunden melden</button>
+        }
+           
+        </div>
+  
+
+
+
+    </EditForm>
+</div>
+@code {
+
+    [Parameter]
+    public string LinkIdentifier { get; set; }
+
+    private Models.TagModel tagModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        tagModel = await tagService.GetTagByLinkIdentifier(LinkIdentifier);
+    }
+
+    async Task Submit()
+    {
+        await tagService.UpdateTag(tagModel);
+    }
+
+    async Task SetMissing()
+    {
+        string prompted = await JsRuntime.InvokeAsync<string>("prompt", "Möchtest du noch einen Text hinterlassen, falls jemand deinen verlorenen Tag einscannt?"); // Prompt
+        tagModel.MissingNote = prompted;
+        tagModel.IsMissing = true;
+        await tagService.UpdateTag(tagModel);
+    }
+
+    async Task UnsetMissing()
+    {
+        tagModel.MissingNote = string.Empty;
+        tagModel.IsMissing = false;
+        await tagService.UpdateTag(tagModel);
+    }
+
+}
+
+
+
+<style>
+
+    .AttributeHead {
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+</style>
